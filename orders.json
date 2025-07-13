@@ -1,0 +1,93 @@
+[
+  {
+    "transaction_number": 1,
+    "timestamp": "2025-07-12 22:42:20",
+    "items": [
+      {
+        "id": "95bd78f9-0042-4e9f-bba8-1325330325a3",
+        "name": "Latte",
+        "quantity": 1,
+        "unit_price": 5.2
+      }
+    ],
+    "total": 5.2
+  },
+  {
+    "transaction_number": 2,
+    "timestamp": "2025-07-12 22:56:00",
+    "items": [
+      {
+        "id": "95bd78f9-0042-4e9f-bba8-1325330325a3",
+        "name": "Latte",
+        "quantity": 1,
+        "unit_price": 5.2
+      },
+      {
+        "id": "468ab4ca-64f2-4450-8aae-8268a3e83157",
+        "name": "Cappuccino",
+        "quantity": 1,
+        "unit_price": 3.75
+      }
+    ],
+    "total": 8.95
+  },
+  {
+    "transaction_number": 3,
+    "timestamp": "2025-07-13 22:37:11",
+    "items": [
+      {
+        "id": "5333689d-46a7-4c61-82ce-8276d4f3b77a",
+        "name": "Water - Tap",
+        "quantity": 1,
+        "unit_price": 0.0
+      },
+      {
+        "id": "0b90952f-5120-4327-ae9a-f9c58c24bfef",
+        "name": "Water - Bottle",
+        "quantity": 1,
+        "unit_price": 1.0
+      }
+    ],
+    "total": 1.0
+  },
+  {
+    "transaction_number": 4,
+    "timestamp": "2025-07-13 22:39:39",
+    "payment_method": "Cash",
+    "items": [
+      {
+        "id": "0b90952f-5120-4327-ae9a-f9c58c24bfef",
+        "name": "Water - Bottle",
+        "quantity": 1,
+        "unit_price": 1.0
+      },
+      {
+        "id": "5333689d-46a7-4c61-82ce-8276d4f3b77a",
+        "name": "Water - Tap",
+        "quantity": 2,
+        "unit_price": 0.0
+      }
+    ],
+    "total": 1.0
+  },
+  {
+    "transaction_number": 5,
+    "timestamp": "2025-07-13 22:42:25",
+    "payment_method": "Card",
+    "items": [
+      {
+        "id": "5333689d-46a7-4c61-82ce-8276d4f3b77a",
+        "name": "Water - Tap",
+        "quantity": 2,
+        "unit_price": 0.0
+      },
+      {
+        "id": "0b90952f-5120-4327-ae9a-f9c58c24bfef",
+        "name": "Water - Bottle",
+        "quantity": 1,
+        "unit_price": 1.0
+      }
+    ],
+    "total": 1.0
+  }
+]

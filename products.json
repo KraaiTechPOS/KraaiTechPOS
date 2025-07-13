@@ -1,0 +1,37 @@
+[
+  {
+    "id": "2eaa8753-b7b9-44d2-bd7c-3c87b2d5fe36",
+    "name": "Latte",
+    "price": 5.25
+  },
+  {
+    "id": "587ce14e-3982-426c-a4dc-9cddd65a77d7",
+    "name": "Cappuccino",
+    "price": 3.75
+  },
+  {
+    "id": "30631562-be4f-46e8-9af4-e091fc30f91e",
+    "name": "Pizza - Mhargerita",
+    "price": 13.25
+  },
+  {
+    "id": "09eb2501-8bf3-499c-a7b7-b833dcd55c1e",
+    "name": "Pizza - Peperoni",
+    "price": 14.0
+  },
+  {
+    "id": "cc92954f-4727-4ca2-a22f-31aba2429143",
+    "name": "Soft Drink - Misc.",
+    "price": 2.0
+  },
+  {
+    "id": "0b90952f-5120-4327-ae9a-f9c58c24bfef",
+    "name": "Water - Bottle",
+    "price": 1.0
+  },
+  {
+    "id": "5333689d-46a7-4c61-82ce-8276d4f3b77a",
+    "name": "Water - Tap",
+    "price": 0.0
+  }
+]

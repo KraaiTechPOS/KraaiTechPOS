@@ -1,37 +1,50 @@
 [
   {
-    "id": "2eaa8753-b7b9-44d2-bd7c-3c87b2d5fe36",
-    "name": "Latte",
-    "price": 5.25
-  },
-  {
-    "id": "587ce14e-3982-426c-a4dc-9cddd65a77d7",
-    "name": "Cappuccino",
-    "price": 3.75
-  },
-  {
-    "id": "30631562-be4f-46e8-9af4-e091fc30f91e",
-    "name": "Pizza - Mhargerita",
-    "price": 13.25
-  },
-  {
-    "id": "09eb2501-8bf3-499c-a7b7-b833dcd55c1e",
-    "name": "Pizza - Peperoni",
-    "price": 14.0
-  },
-  {
-    "id": "cc92954f-4727-4ca2-a22f-31aba2429143",
-    "name": "Soft Drink - Misc.",
-    "price": 2.0
-  },
-  {
-    "id": "0b90952f-5120-4327-ae9a-f9c58c24bfef",
+    "id": "c27bf0cd-0055-4930-bc0d-e058e64f8612",
     "name": "Water - Bottle",
-    "price": 1.0
+    "price": 1.5,
+    "category": "Drinks"
   },
   {
-    "id": "5333689d-46a7-4c61-82ce-8276d4f3b77a",
+    "id": "2802c6f8-0ef8-491c-8d4b-4622e685237e",
     "name": "Water - Tap",
-    "price": 0.0
+    "price": 0.5,
+    "category": "Drinks"
+  },
+  {
+    "id": "895ef53f-574b-424f-9fb2-219ebc2788c3",
+    "name": "Coffee - Mocha",
+    "price": 3.5,
+    "category": "Drinks"
+  },
+  {
+    "id": "fdda3820-33c6-41f5-8b8c-6a85287214b2",
+    "name": "Pizza - Margherita (20)",
+    "price": 12.5,
+    "category": "Pizza"
+  },
+  {
+    "id": "fe4780eb-5e8c-4881-b531-48a055c369d7",
+    "name": "Pizza - Pepperoni (20)",
+    "price": 13.0,
+    "category": "Pizza"
+  },
+  {
+    "id": "b387ca74-8098-4e9d-8a09-4deff57e7710",
+    "name": "Pizza Burger",
+    "price": 10.25,
+    "category": "Burgers"
+  },
+  {
+    "id": "efd6ecb7-f179-45a3-b623-62221794e6eb",
+    "name": "Cheeseburger",
+    "price": 10.25,
+    "category": "Burgers"
+  },
+  {
+    "id": "9216b0dc-d104-46cf-b054-d7f96d7cd56f",
+    "name": "Bacon Cheeseburger",
+    "price": 10.5,
+    "category": "Burgers"
   }
 ]

@@ -10,6 +10,7 @@ from kivy.uix.popup import Popup
 from kivy.uix.textinput import TextInput
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelItem
 
 PRODUCTS_FILE = "products.json"
 ORDERS_FILE = "orders.json"
@@ -17,10 +18,7 @@ ORDERS_FILE = "orders.json"
 def load_products():
     if not os.path.exists(PRODUCTS_FILE):
         with open(PRODUCTS_FILE, "w") as f:
-            json.dump([
-                {"id": str(uuid.uuid4()), "name": "Latte", "price": 4.5},
-                {"id": str(uuid.uuid4()), "name": "Cappuccino", "price": 3.75}
-            ], f)
+            json.dump([], f)
     with open(PRODUCTS_FILE, "r") as f:
         return json.load(f)
 
@@ -40,8 +38,7 @@ def save_orders(orders):
         json.dump(orders, f, indent=2)
 
 def show_error(message):
-    popup = Popup(title="Error", content=Label(text=message),
-                  size_hint=(0.6, 0.3))
+    popup = Popup(title="Error", content=Label(text=message), size_hint=(0.6, 0.3))
     popup.open()
 
 class POSLayout(BoxLayout):
@@ -50,24 +47,18 @@ class POSLayout(BoxLayout):
         self.products = load_products()
         self.orders = load_orders()
 
-        # Compute next transaction number
         self.next_transaction_number = 1
         if self.orders:
             last_txn = max(order["transaction_number"] for order in self.orders if "transaction_number" in order)
             self.next_transaction_number = last_txn + 1
 
-        # Left: product buttons
-        self.product_grid = GridLayout(cols=2, spacing=10, size_hint=(0.7, None))
-        self.product_grid.bind(minimum_height=self.product_grid.setter('height'))
+        # Left: product tabs
+        self.tab_panel = TabbedPanel(do_default_tab=False, size_hint=(0.7, 1))
         self.refresh_products()
 
-        product_scroll = ScrollView(size_hint=(0.7, 1))
-        product_scroll.add_widget(self.product_grid)
-
-        # Right: cart, total, admin
+        # Right: cart and controls
         cart_layout = BoxLayout(orientation='vertical', size_hint=(0.3, 1), padding=10)
-
-        self.cart_items = {}  # key: product id, value: {'product': product, 'quantity': int}
+        self.cart_items = {}
 
         self.cart_list = GridLayout(cols=1, spacing=5, size_hint_y=None)
         self.cart_list.bind(minimum_height=self.cart_list.setter('height'))
@@ -75,10 +66,8 @@ class POSLayout(BoxLayout):
         cart_scroll = ScrollView(size_hint=(1, 0.6))
         cart_scroll.add_widget(self.cart_list)
 
-        # Running total label
         self.total_label = Label(text="Total: $0.00", font_size=24, size_hint=(1, 0.1))
 
-        # Buttons
         total_btn = Button(text="Checkout", size_hint=(1, 0.1), on_press=self.show_total)
         clear_btn = Button(text="Clear Cart", size_hint=(1, 0.1), on_press=self.confirm_clear_cart)
         admin_btn = Button(text="Admin", size_hint=(1, 0.1), on_press=self.open_admin_menu)
@@ -89,16 +78,31 @@ class POSLayout(BoxLayout):
         cart_layout.add_widget(clear_btn)
         cart_layout.add_widget(admin_btn)
 
-        self.add_widget(product_scroll)
+        self.add_widget(self.tab_panel)
         self.add_widget(cart_layout)
 
     def refresh_products(self):
-        self.product_grid.clear_widgets()
+        self.tab_panel.clear_tabs()
+        categorized = {}
         for p in self.products:
-            btn = Button(text=f"{p['name']}\n${p['price']:.2f}",
-                         font_size=24, size_hint_y=None, height=120)
-            btn.bind(on_press=lambda instance, item=p: self.add_to_cart(item))
-            self.product_grid.add_widget(btn)
+            category = p.get("category", "Uncategorized")
+            categorized.setdefault(category, []).append(p)
+
+        for category, items in categorized.items():
+            grid = GridLayout(cols=2, spacing=10, size_hint_y=None)
+            grid.bind(minimum_height=grid.setter('height'))
+
+            for p in items:
+                btn = Button(text=f"{p['name']}\n${p['price']:.2f}", font_size=24, size_hint_y=None, height=120)
+                btn.bind(on_press=lambda instance, item=p: self.add_to_cart(item))
+                grid.add_widget(btn)
+
+            scroll = ScrollView()
+            scroll.add_widget(grid)
+
+            tab = TabbedPanelItem(text=category)
+            tab.add_widget(scroll)
+            self.tab_panel.add_widget(tab)
 
     def add_to_cart(self, product):
         pid = product["id"]
@@ -107,7 +111,7 @@ class POSLayout(BoxLayout):
         else:
             self.cart_items[pid] = {'product': product, 'quantity': 1}
         self.refresh_cart()
-    
+
     def refresh_cart(self):
         self.cart_list.clear_widgets()
         total = 0
@@ -142,16 +146,20 @@ class POSLayout(BoxLayout):
         txn_number = self.next_transaction_number
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        # Save order
         order_details = {
             "transaction_number": txn_number,
             "timestamp": timestamp,
             "items": [
-                {"id": item['product']['id'], "name": item['product']['name'], "quantity": item['quantity'], "unit_price": item['product']['price']}
-                for item in self.cart_items.values()
+                {
+                    "id": item['product']['id'],
+                    "name": item['product']['name'],
+                    "quantity": item['quantity'],
+                    "unit_price": item['product']['price']
+                } for item in self.cart_items.values()
             ],
             "total": total
         }
+
         self.orders.append(order_details)
         save_orders(self.orders)
         self.next_transaction_number += 1
@@ -162,12 +170,7 @@ class POSLayout(BoxLayout):
             size_hint=(0.5, 0.4)
         )
 
-        def on_dismiss(instance):
-            # Clear the cart after total is acknowledged
-            self.cart_items.clear()
-            self.refresh_cart()
-
-        popup.bind(on_dismiss=on_dismiss)
+        popup.bind(on_dismiss=lambda instance: self.clear_cart_and_close(popup))
         popup.open()
 
     def confirm_clear_cart(self, instance):
@@ -180,12 +183,9 @@ class POSLayout(BoxLayout):
         btn_layout.add_widget(no_btn)
         content.add_widget(btn_layout)
 
-        popup = Popup(title="Confirm Clear Cart", content=content,
-                      size_hint=(0.5, 0.4))
-
+        popup = Popup(title="Confirm Clear Cart", content=content, size_hint=(0.5, 0.4))
         yes_btn.bind(on_press=lambda x: self.clear_cart_and_close(popup))
         no_btn.bind(on_press=popup.dismiss)
-
         popup.open()
 
     def clear_cart_and_close(self, popup):
@@ -196,8 +196,6 @@ class POSLayout(BoxLayout):
     def open_admin_menu(self, instance):
         popup = AdminSubMenu(self)
         popup.open()
-
-# AdminSubMenu and AdminPopup unchanged — same as before with product remove button added
 
 class AdminSubMenu(Popup):
     def __init__(self, pos_app, **kwargs):
@@ -230,13 +228,10 @@ class AdminSubMenu(Popup):
         btn_layout.add_widget(no_btn)
         content.add_widget(btn_layout)
 
-        popup = Popup(title="Confirm Exit", content=content,
-                      size_hint=(0.5, 0.4))
-
+        popup = Popup(title="Confirm Exit", content=content, size_hint=(0.5, 0.4))
         yes_btn.bind(on_press=lambda x: App.get_running_app().stop())
         yes_btn.bind(on_press=popup.dismiss)
         no_btn.bind(on_press=popup.dismiss)
-
         popup.open()
 
 class AdminPopup(Popup):
@@ -246,7 +241,6 @@ class AdminPopup(Popup):
         self.products = pos_app.products
 
         layout = BoxLayout(orientation='vertical', spacing=10, padding=10)
-
         self.grid = GridLayout(cols=1, spacing=5, size_hint_y=None)
         self.grid.bind(minimum_height=self.grid.setter('height'))
 
@@ -266,17 +260,16 @@ class AdminPopup(Popup):
 
     def add_product_row(self, product=None):
         row = BoxLayout(size_hint_y=None, height=40)
-
         name_input = TextInput(text=product["name"] if product else "", multiline=False)
         price_input = TextInput(text=str(product["price"]) if product else "", multiline=False, input_filter='float')
-
+        category_input = TextInput(text=product.get("category", "") if product else "", multiline=False)
         remove_btn = Button(text="Remove", size_hint_x=None, width=80)
         remove_btn.bind(on_press=lambda btn: self.remove_row(row))
 
         row.add_widget(name_input)
         row.add_widget(price_input)
+        row.add_widget(category_input)
         row.add_widget(remove_btn)
-
         self.grid.add_widget(row)
 
     def add_blank_row(self, instance):
@@ -288,20 +281,21 @@ class AdminPopup(Popup):
 
     def save_changes(self, instance):
         new_products = []
-        for row in self.grid.children[::-1]:  # top to bottom
+        for row in self.grid.children[::-1]:
             children = row.children
-            # children order: [remove_btn, price_input, name_input]
-            name_input = children[2]
-            price_input = children[1]
+            name_input = children[3]
+            price_input = children[2]
+            category_input = children[1]
 
             name = name_input.text.strip()
             price_text = price_input.text.strip()
+            category = category_input.text.strip() or "Uncategorized"
 
             if name and price_text:
                 try:
                     price = float(price_text)
-                    product_id = str(uuid.uuid4())
-                    new_products.append({"id": product_id, "name": name, "price": price})
+                    product_id = getattr(row, "product_id", str(uuid.uuid4()))
+                    new_products.append({"id": product_id, "name": name, "price": price, "category": category})
                 except ValueError:
                     show_error(f"Invalid price: {price_text}")
                     return
